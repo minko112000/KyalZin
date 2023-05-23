@@ -1,0 +1,50 @@
+#intro, #brand {
+  width: 100%;
+  height: 100%;
+  background: #00001f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999999;
+}
+
+#brand {
+  height: 80px;
+  width: 100%;
+}
+
+#brand g {
+  fill: #00001f;
+  stroke-width: 30;
+  stroke: #2f599d;
+  stroke-dasharray: 0;
+  animation: intro 4s ease-in forwards alternate;
+}
+
+@keyframes intro {
+  to {
+    stroke-dasharray: 10000;
+  }
+}
+
+#footer {
+  height: 100px;
+  width: 100%;
+  padding: 20px 0;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: column;
+}
+
+#footer b {
+  cursor: pointer;
+  user-select: none;
+}
+
+a:hover {
+  color: #2f599d;
+}
