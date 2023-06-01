@@ -3,7 +3,6 @@
   margin: 0;
   box-sizing: border-box;
   transition: opacity .5s;
-  scroll-behavior: smooth;
 }
 
 ::-webkit-scrollbar {
@@ -268,11 +267,35 @@ main .page {
 }
 
 #bonus-box span {
-  position: absolute;
-  top: 0;
-  font-size: 2em;
-  letter-spacing: 1px;
-  font-family: Fantasy;
+  font: 1em Monaco;
+  white-space: nowrap;
+  width: 100%;
+  text-align: center;
+  animation: rainbow_color 2s linear infinite;
+}
+
+@keyframes rainbow_color {
+  0% {
+    color: #9400d3;
+  }
+  14% {
+    color: #4b0082;
+  }
+  28% {
+    color: #0000ff;
+  }
+  62% {
+    color: #00ff00;
+  }
+  76% {
+    color: #ffff00;
+  }
+  90% {
+    color: #ff7f00;
+  }
+  100% {
+    color: #ff0000;
+  }
 }
 
 #bonus-box small {
@@ -293,8 +316,18 @@ main .page {
 
 #bonus-box img {
   width: 50%;
-  transform: scale(2);
+  transform: scale(1.8) translateY(5px);
   filter: drop-shadow(0 0 20px #2f599d);
+  animation: scale_up 2s linear infinite alternate;
+}
+
+@keyframes scale_up {
+  from {
+    transform: scale(1.8) translateY(5px);
+  }
+  from {
+    transform: scale(2) translateY(-5px);
+  }
 }
 
 #home-page #banner {
@@ -607,10 +640,6 @@ main .page {
   display: none;
 }
 
-#wallet-page h2 {
-  margin: 6px 3px 0 0;
-}
-
 #wallet-page .log-box-container {
   width: 100%;
 }
@@ -618,24 +647,69 @@ main .page {
 .log-box-container .log-box {
   width: 100%;
   margin-top: 24px;
-  padding: 6px;
+  padding: 6px 12px;
   display: flex;
   justify-content: space-around;
   flex-direction: column;
 }
 
-.log-box-container .log-box small,
-.log-box-container .log-box > b {
-  height: 30px;
+.log-box > div {
+  height: 50px;
+  width: 100%;
   display: flex;
   align-items: center;
-  padding: 3px;
 }
 
-.log-box > b {
-  border-bottom: 1px solid #2f599d;
-  padding-bottom: 9px !important;
+.log-box > div small,
+.log-box > div b {
+  width: 50%;
 }
+
+.log-box > div:first-child {
+  justify-content: space-between;
+  border-bottom: 1px solid #2f599d;
+}
+
+.log-box > div:first-child b {
+  font-weight: 300;
+}
+
+.log-box > div:first-child i {
+  font-size: .8em;
+}
+
+.log-tab-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.log-tab-bar b {
+  margin-right: 12px;
+  flex: none;
+  background: #2f599d;
+  padding: 3px 6px;
+  margin-top: 6px;
+  border-radius: 2px;
+  cursor: pointer;
+  user-select: none;
+  opacity: .7;
+}
+
+.log-tab-bar .active {
+  opacity: 1;
+}
+
+.log-tab-bar b small {
+  height: 25px;
+  padding: 0 3px;
+  margin-left: 4px;
+  background: rgba(255, 255, 255, .1);
+  backdrop-filter: blur(2px);
+}
+
+
 
 /* UP-BOX START */
 #up-box {
@@ -963,7 +1037,7 @@ main .page {
   height: 500px;
 }
 
-#up-box #money-edit-page .title {
+#up-box #money-edit-page form .title {
   width: 100%;
   height: 35px;
   display: flex;
@@ -972,12 +1046,12 @@ main .page {
   margin-top: 3px;
 }
 
-#up-box #money-edit-page .title i {
+#up-box #money-edit-page form .title i {
   font-size: .5em;
   color: #bb2124;
 }
 
-#up-box #money-edit-page .accounts {
+#up-box #money-edit-page form .accounts {
   height: 55px;
   width: 100%;
   display: flex;
@@ -986,7 +1060,7 @@ main .page {
   margin-top: 6px;
 }
 
-#money-edit-page .accounts .check {
+#money-edit-page form .accounts .check {
   height: 90%;
   width: 30%;
   display: flex;
@@ -997,12 +1071,12 @@ main .page {
   transition: all .5s;
 }
 
-#money-edit-page .accounts .check small {
+#money-edit-page form .accounts .check small {
   margin-right: 6px;
   font-weight: 500;
 }
 
-#money-edit-page .accounts .check div {
+#money-edit-page form .accounts .check div {
   height: 25px;
   width: 25px;
   border-radius: 6px;
@@ -1011,19 +1085,19 @@ main .page {
   background-repeat: no-repeat;
 }
 
-#money-edit-page .accounts div:first-child div {
+#money-edit-page form .accounts div:first-child div {
   background-image: url('../images/wave.png');
 }
 
-#money-edit-page .accounts div:nth-child(2) div {
+#money-edit-page form .accounts div:nth-child(2) div {
   background-image: url('../images/kbz.png');
 }
 
-#money-edit-page .accounts .checked {
+#money-edit-page form .accounts .checked {
   opacity: 1;
 }
 
-#money-edit-page .accounts .checked div {
+#money-edit-page form .accounts .checked div {
   position: relative;
   animation: scale .3s linear forwards;
 }
@@ -1042,7 +1116,7 @@ main .page {
   }
 }
 
-#money-edit-page .accounts .checked div:before {
+#money-edit-page form .accounts .checked div:before {
   content: '✔';
   position: absolute;
   width: 100%;
@@ -1057,7 +1131,7 @@ main .page {
               -2px -2px 3px rgba(0, 0, 0, 0.1);
 }
 
-#money-edit-page > .input {
+#money-edit-page form > .input {
   height: 45px;
   width: 100%;
   border: 1px solid #2f599d;
@@ -1070,21 +1144,21 @@ main .page {
   padding: 0 6px;
 }
 
-#money-edit-page .to {
+#money-edit-page form .to {
   border: none;
   border-bottom: 1px solid #2f599d;
   border-radius: 0;
 }
 
-#money-edit-page > .input i {
+#money-edit-page form > .input i {
   color: #2f599d;
 }
 
-#money-edit-page > .amount i {
+#money-edit-page form > .amount i {
   color: #c7c7c7;
 }
 
-#money-edit-page > .input label {
+#money-edit-page form > .input label {
   position: absolute;
   height: 20px;
   left: 0;
@@ -1098,15 +1172,15 @@ main .page {
   opacity: .8;
 }
 
-#money-edit-page > .label-up label {
+#money-edit-page form > .label-up label {
   top: -10px;
   left: 6px;
   font-size: .8em;
   z-index: 1;
 }
 
-#money-edit-page > .input div,
-#money-edit-page > .input input {
+#money-edit-page form > .input div,
+#money-edit-page form > .input input {
   width: 100%;
   height: 40px;
   display: flex;
@@ -1115,7 +1189,7 @@ main .page {
   position: relative;
 }
 
-#money-edit-page #upload-slip {
+#money-edit-page form #upload-slip {
   position: absolute;
   top: 2px;
   right: 2px;
@@ -1137,7 +1211,7 @@ main .page {
   opacity: .8;
 }
 
-#money-edit-page .buy-star-box {
+#money-edit-page form .buy-star-box {
   height: 150px;
   width: 100%;
   display: flex;
@@ -1146,7 +1220,7 @@ main .page {
   flex-direction: column;
 }
 
-#money-edit-page .buy-star-box > span {
+#money-edit-page form .buy-star-box > span {
   height: 40px;
   width: 100%;
   display: flex;
@@ -1154,7 +1228,7 @@ main .page {
   align-items: center;
 }
 
-#money-edit-page .buy-star-box > .star-amount {
+#money-edit-page form .buy-star-box > .star-amount {
   height: 50px;
   width: 200px;
   display: flex;
@@ -1210,16 +1284,16 @@ main .page {
   filter: drop-shadow(0 0 12px #2f599d);
 }
 
-#money-edit-page .target {
+#money-edit-page form .target {
   position: relative;
 }
 
-#money-edit-page .buy-star-box .target:before {
+#money-edit-page form .buy-star-box .target:before {
   content: '' !important;
   animation-name: none;
 }
 
-#money-edit-page .target:before {
+#money-edit-page form .target:before {
   content: '|';
   position: absolute;
   top: 3px;
@@ -1276,6 +1350,17 @@ main .page {
   margin-left: 12px;
 }
 
+.pen-box {
+  width: 100%;
+  height: 70px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
 #create-post-page .header {
   height: 55px;
   width: 100%;
@@ -1319,6 +1404,14 @@ main .page {
   text-align: right;
   width: 100%;
 }
+
+#report-post-page > b {
+  display: block;
+  font-size: 1.1em;
+  font-weight: 300;
+  margin: 6px 6px 5px 0;
+}
+
 
 #report-post-page #report-content {
   height: 250px;
@@ -1829,7 +1922,7 @@ svg g {
     width: 767px;
   }
   
-  #next-page {
+  #next-page, .extra-page {
     width: 767px;
   }
 }

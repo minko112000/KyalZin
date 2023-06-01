@@ -1,6 +1,8 @@
 <?php
 
 include('connect.php');
+session_start();
+$username = $_SESSION['username'];
 
 if (!empty($_POST['type'])) {
   $query;
@@ -38,7 +40,17 @@ if (!empty($_POST['type'])) {
   
   $result = mysqli_query($con, $query);
   if ($result) {
-    echo('OK');
+    if ($type == 'report_post' or $type == 'edit_post' or $type == 'create_post') {
+      $query2 = "UPDATE users SET pen = pen - 1 WHERE username = '$username'";
+      $result2 = mysqli_query($con, $query2);
+      if ($result2) {
+        echo('OK');
+      } else {
+        echo('ERR');
+      }
+    } else {
+      echo('OK');
+    }
   } else {
     echo('ERR');
   }

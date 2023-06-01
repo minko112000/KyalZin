@@ -40,7 +40,7 @@ if (!isset($_SESSION['username'])) {
         </div>
       </nav>
       <div id="bonus-box">
-        <span>10 Author Invited</span>
+        <span>Successful invited 10 author</span>
         <img src="../../images/bonus.png">
         <small>Bonus</small>
         <b>20000 Ks</b>
@@ -124,8 +124,18 @@ if (!isset($_SESSION['username'])) {
               <small>Invite</small>
             </div>
           </div>
-          <h2 class="mt-2">Log</h2>
-          <div class="log-box-container"></div>
+          <div class="log-tab-bar">
+            <b class="vb" id="all_log">All<small>0</small></b>
+            <b class="vb" id="recharge_log">Deposit<small>0</small></b>
+            <b class="vb" class="vb" id="withdrawal_log">Withdrawal<small>0</small></b>
+            <b class="vb" id="buy_star_log">Buy star<small>0</small></b>
+            <b class="vb" id="sell_star_log">Sell star<small>0</small></b>
+            <b class="vb" id="one_member_invited_log">One author invited<small>0</small></b>
+            <b class="vb" id="ten_member_invited_log">Ten author invited<small>0</small></b>
+          </div>
+          <div class="log-box-container">
+            
+          </div>
         </div>
         <div id="profile-page" class="page">
           <div class="profile my-profile">
@@ -162,7 +172,7 @@ if (!isset($_SESSION['username'])) {
           </div>
           <div class="tab">
             <div class="tab-selector"></div>
-            <b id="my-posts" class="vb my-posts">Posts</b>
+            <b id="my-posts" class="vb my-posts">Posts<small class="total-posts">00</small></b>
             <b id="members" class="vb member-lists">Members<small class="members"></small></b>
             <b id="about" class="vb">About</b>
             <b id="edit-profile" class="vb">Edit profile</b>
@@ -448,70 +458,73 @@ if (!isset($_SESSION['username'])) {
           </div>
         </div>
         <div id="money-edit-page">
-          <h2 class="title">Title</h2>
-          <div class="accounts">
-            <div id="wave" class="check checked vb">
-              <div></div>
-              <small>Wave Pay</small>
+          <form id="money-edit-form">
+            <h2 class="title">Title</h2>
+            <div class="accounts">
+              <div id="wave" class="check checked vb">
+                <div></div>
+                <small>Wave Pay</small>
+              </div>
+              <div id="kbz" class="check vb">
+                <div></div>
+                <small>KBZ Pay</small>
+              </div>
             </div>
-            <div id="kbz" class="check vb">
-              <div></div>
-              <small>KBZ Pay</small>
+            <input name="account" hidden type="text" id="account" value="Wave Money">
+            <div class="to input">
+              <div>0615845878</div>
+              <i class="fa-solid fa-copy vb copy-address"></i>
             </div>
-          </div>
-          <div class="to input">
-            <div>0615845878</div>
-            <i class="fa-solid fa-copy vb copy-address"></i>
-          </div>
-          <div class="t-no input">
-            <label>Transaction Number Last 7 Digits</label>
-            <input type="text" id="t-no">
-            <div id="upload-slip" class="vb"></div>
-          </div>
-          <div class="amount input">
-            <label>Amount</label>
-            <input type="text" id="amount">
-          </div>
-          <div class="address input">
-            <label>Address</label>
-            <input type="text" id="address">
-          </div>
-          <div class="buy-star-box">
-            <small>Price</small>
-            <span>
-              <h3 class="price">0</h3>
-              <h3>MMK</h3>
-            </span>
-            <div class="star-amount input">
-              <span class="vb" id="minus">-</span>
-              <input type="text" id="star-amount">
-              <span class="vb" id="plus">+</span>
+            <div class="t-no input">
+              <label>Transaction Number Last 7 Digits</label>
+              <input name="t-no" type="text" id="t-no">
+              <div id="upload-slip" class="vb"></div>
             </div>
-          </div>
-          <div class="keyboard">
-            <div>
-              <div>7</div>
-              <div>8</div>
-              <div>9</div>
+            <div class="amount input">
+              <label>Amount</label>
+              <input name="amount" type="text" id="amount">
             </div>
-            <div>
-              <div>4</div>
-              <div>5</div>
-              <div>6</div>
+            <div class="address input">
+              <label>Address</label>
+              <input name="address" type="text" id="address">
             </div>
-            <div>
-              <div>1</div>
-              <div>2</div>
-              <div>3</div>
+            <div class="buy-star-box">
+              <small>Price</small>
+              <span>
+                <h3 class="price">0</h3>
+                <h3>MMK</h3>
+              </span>
+              <div class="star-amount input">
+                <span class="vb" id="minus">-</span>
+                <input type="text" id="star-amount">
+                <span class="vb" id="plus">+</span>
+              </div>
             </div>
-            <div>
-              <div>00</div>
-              <div>0</div>
-              <div id="del">✖</div>
+            <div class="keyboard">
+              <div>
+                <div>7</div>
+                <div>8</div>
+                <div>9</div>
+              </div>
+              <div>
+                <div>4</div>
+                <div>5</div>
+                <div>6</div>
+              </div>
+              <div>
+                <div>1</div>
+                <div>2</div>
+                <div>3</div>
+              </div>
+              <div>
+                <div>00</div>
+                <div>0</div>
+                <div id="del">✖</div>
+              </div>
             </div>
-          </div>
-          <button class="vb submit">Submit</button>
-          <input name="slip" type="file" hidden  class="upload-slip" accept="image/*">
+            <button type="button" class="vb submit">Submit</button>
+            <input name="slip" type="file" hidden  class="upload-slip" accept="image/*">
+          </form>
         </div>
         <div id="text-box-more-page">
           <div id="edit-post" class="eb vb text-box-more-item w up create-post edit-post">
@@ -540,6 +553,10 @@ if (!isset($_SESSION['username'])) {
           </div>
         </div>
         <div id="create-post-page">
+          <div class="pen-box">
+            <small>Pen</small>
+            <h2 class="pen">000</h2>
+          </div>
           <div class="header">
             <div class="profile my-profile">
               <img>
@@ -554,7 +571,11 @@ if (!isset($_SESSION['username'])) {
           </div>
         </div>
         <div id="report-post-page">
-          <h4 class="mt-4">Report something that doesn't look right</h4>
+          <div class="pen-box">
+            <small>Pen</small>
+            <h2 class="pen">000</h2>
+          </div>
+          <b>Report something that doesn't look right</b>
           <textarea id="report-content" placeholder="Write Content"></textarea>
           <button type="button" class="vb" id="submit-report">Submit Report</button>
         </div>

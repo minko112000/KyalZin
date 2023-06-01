@@ -32,7 +32,22 @@ $query;
 if (isset($_GET['username'])) {
   if ($_GET['username'] == $_SESSION['username']) {
     $username = $_SESSION['username'];
-    $query = "SELECT * FROM users WHERE username = '$username'";
+    $day = $_GET['date'];
+    $month = $_GET['month'];
+    $year = $_GET['year'];
+    $visited_query = "SELECT * FROM visitors WHERE visited_username = '$username' AND visited_day = $day
+                      AND visited_month = '$month' AND visited_year = $year";
+    $visited_result = mysqli_query($con, $visited_query);
+    if (mysqli_num_rows($visited_result) == 0) {
+      $visited_add_query = "INSERT INTO visitors (visited_username, visited_day, visited_month, visited_year)
+                            VALUES('$username', $day, '$month', $year)";
+      $visited_add_result = mysqli_query($con, $visited_add_query);
+      if ($visited_add_result) {
+        $query = "SELECT * FROM users WHERE username = '$username'";
+      }
+    } else {
+      $query = "SELECT * FROM users WHERE username = '$username'";
+    }
   }
 }
 
@@ -46,6 +61,7 @@ if (mysqli_num_rows($result) == 1) {
   $row = mysqli_fetch_array($result);
   $data['id'] = $row['id'];
   $data['code'] = $row['code'];
+  $_SESSION['user_code'] = $row['code'];
   $data['fname'] = $row['fname'];
   $data['lname'] = $row['lname'];
   $data['profile'] = $row['profile'];

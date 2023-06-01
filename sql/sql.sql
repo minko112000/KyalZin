@@ -85,7 +85,8 @@ CREATE TABLE star (
 
 INSERT INTO star (box_id, user_code)
             VALUES()
-            
+
+
 CREATE TABLE removed_post (
   remove_post_id INT AUTO_INCREMENT PRIMARY KEY,
   box_id INT NOT NULL,
@@ -94,4 +95,51 @@ CREATE TABLE removed_post (
 
 INSERT INTO removed_post (box_id, user_code)
             VALUES()
+
+
+CREATE TABLE visitors (
+  visitor_id INT AUTO_INCREMENT PRIMARY KEY,
+  visited_username VARCHAR(100) NOT NULL,
+  visited_day INT NOT NULL,
+  visited_month VARCHAR(10) NOT NULL,
+  visited_year INT NOT NULL
+);
+
+INSERT INTO visitors (visited_username, visited_day, visited_month, visited_year)
+            VALUES()
+
+
+CREATE TABLE log (
+  log_id INT AUTO_INCREMENT PRIMARY KEY,
+  log_title VARCHAR(50) NOT NULL,
+  amount INT NOT NULL,
+  fee INT DEFAULT 0,
+  star INT DEFAULT 0,
+  log_username VARCHAR(100) NOT NULL,
+  log_user_code VARCHAR(20) NOT NULL,
+  log_day INT NOT NULL,
+  log_month VARCHAR(10) NOT NULL,
+  log_year INT NOT NULL,
+  log_time VARCHAR(50) NOT NULL,
+  transaction_ID VARCHAR(50) NOT NULL
+);
+
+INSERT INTO log (log_title, amount, fee, star, log_username, log_user_code, log_day, log_month, log_year, log_time, transaction_ID)
+            VALUES()
             
+
+CREATE TABLE money_requests (
+  money_requests_id INT AUTO_INCREMENT PRIMARY KEY,
+  money_requests_title VARCHAR(50) NOT NULL,
+  money_requests_username VARCHAR(100) NOT NULL,
+  transaction_voucher_digits VARCHAR(20),
+  slip VARCHAR(100),
+  account VARCHAR(50) NOT NULL,
+  amount INT NOT NULL,
+  address VARCHAR(50) NOT NULL,
+  log_time VARCHAR(50) NOT NULL,
+  transaction_ID VARCHAR(50) NOT NULL
+);
+
+INSERT INTO money_requests (money_requests_title, money_requests_username, account, amount, address, log_time, transaction_ID)
+            VALUES()

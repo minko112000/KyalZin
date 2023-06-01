@@ -19,6 +19,48 @@ let TOTAL_LIKES;
 let LOCATION = 'home'
 let INVITE_LINK = 'localhost:8000/signup.php?code='
 let SHARE_LINK = 'localhost:8000/php/ui/home.php?text='
+const textMonth = month => {
+  let text_month
+  switch (month) {
+    case 0:
+      text_month = 'Jan'
+      break;
+    case 1:
+      text_month = 'Feb'
+      break;
+    case 2:
+      text_month = 'Mar'
+      break;
+    case 3:
+      text_month = 'Apr'
+      break;
+    case 4:
+      text_month = 'May'
+      break;
+    case 5:
+      text_month = 'Jun'
+      break;
+    case 6:
+      text_month = 'Jul'
+      break;
+    case 7:
+      text_month = 'Aug'
+      break;
+    case 8:
+      text_month = 'Sep'
+      break;
+    case 9:
+      text_month = 'Oct'
+      break;
+    case 10:
+      text_month = 'Nov'
+      break;
+    
+    default:
+      text_month = 'Dec'
+  }
+  return text_month
+}
 
 const userDataShow = () => {
   $('.vb').click(function () {
@@ -65,10 +107,14 @@ const getUser = (id, type, CODE) => {
 }
 
 const getData = () => {
+  let DATE = new Date()
+  let date = DATE.getDate()
+  let month = textMonth(DATE.getMonth())
+  let year = DATE.getFullYear()
   $.ajax({
       url: '../server/get_data.php',
       type: 'GET',
-      data: 'username='+username,
+      data: `username=${username}&date=${date}&month=${month}&year=${year}`,
       contentType: false,
       processData: false,
       success: function (r) {
@@ -86,11 +132,6 @@ const getData = () => {
         let MEMBERS = data.member
         BALANCE = parseInt(data.balance)
         STAR = parseInt(data.star, 10)
-        if (STAR == 0) {
-          $('.fa-star').css('pointerEvents', 'none')
-        } else {
-          $('.fa-star').css('pointerEvents', 'auto')
-        }
         PEN = parseInt(data.pen, 10)
         let AUTHOR_COUNT = parseInt(data.author_count, 10)
         if (AUTHOR_COUNT >= 10) {
@@ -114,6 +155,7 @@ const getData = () => {
         $('.balance').text(BALANCE + MMK)
         $('.status').text(STATUS)
         $('.star').text(STAR)
+        $('.spen').text(PEN)
         $('.earning').text(EARNING + MMK)
         $('.sponsor').text(SPONSOR)
         $('.email').text(EMAIL)
@@ -126,7 +168,7 @@ const getData = () => {
         planDurationCheck(STATUS, END_DATE)
         $('#create-post-btn').click(function () {
           let text = $('#create-post-text').val().trim()
-          createPost(PROFILE, NAME, text, CODE, action_id)
+          createPost(PROFILE, NAME, text, CODE, action_id, PEN)
         })
         if ($('#share-content').val() != '') {
           $('nav, main, #next-page, #user-page').hide()
@@ -136,6 +178,15 @@ const getData = () => {
         } else {
           $('#home').click()
         }
+        
+        //WALLET
+        $('.log-tab-bar b').click(function () {
+          loadingShow()
+          $('.log-tab-bar b').removeClass('active')
+          $(this).addClass('active')
+          let log_type = $(this).attr('id')
+          getWalletLogData(CODE, log_type)
+        })
         
         //MORE
         const editProfile = edit => {
@@ -329,6 +380,7 @@ const totalLikesCalculate = (contents_code, likes, user_code) => {
 
 const getContent = (STAR, CODE, type) => {
   TOTAL_LIKES = 0
+  TOTAL_POSTS = 0
   $('.text-box').remove()
   loadingShow()
   $.ajax({
@@ -340,6 +392,7 @@ const getContent = (STAR, CODE, type) => {
       success: function (r) {
         let contents = JSON.parse(r)
         if (contents.length == 0) {
+          $('.total-posts').text(0)
           $('.contents-empty-container').removeClass('empty')
           if (type == 'all') {
               $('#text-box-container').addClass('empty')
@@ -358,6 +411,7 @@ const getContent = (STAR, CODE, type) => {
           $('.contents-empty-container').html('')
           $('.contents-empty-container').removeClass('empty')
           for (let i = 0; i < contents.length; i++) {
+            TOTAL_POSTS += 1
             let time = timeCalculator(contents[i].time)
             let content_box = `
               <div id="${contents[i].id}" class="text-box eb">
@@ -396,6 +450,7 @@ const getContent = (STAR, CODE, type) => {
             } else if (type == 'profile') {
               $('#profile-page .posts-text-box-container')[0].innerHTML += content_box
               totalLikesCalculate(contents[i].code, contents[i].likes, CODE)
+              $('.total-posts').text(TOTAL_POSTS)
             } else if (type.length == 11) {
               $('#user-page .posts-text-box-container')[0].innerHTML += content_box
               totalLikesCalculate(contents[i].code, contents[i].likes, type)
@@ -412,6 +467,11 @@ const getContent = (STAR, CODE, type) => {
         }
         
         //HOME
+        if (STAR <= 0) {
+          $('.text-box .fa-star').css('pointerEvents', 'none')
+        } else {
+          $('.text-box .fa-star').css('pointerEvents', 'auto')
+        }
         $('.vb').click(function () {
           navigator.vibrate(20)
         })
@@ -433,7 +493,7 @@ const getContent = (STAR, CODE, type) => {
           }
         })
         $('#submit-report').click(function () {
-          reportPost(CODE)
+          reportPost(CODE, PEN)
         })
         $('.text-box-more-item').click(function () {
           if ($(this).hasClass('edit-post')) {
@@ -510,9 +570,11 @@ const getContent = (STAR, CODE, type) => {
             } else {
               if ($(this).hasClass('report-post')) {
                 $('#report-post-page').show()
+                $('#pen-box').show()
               } else {
                 if ($(this).hasClass('create-post')) {
                   $('#create-post-page').show()
+                  $('#pen-box').show()
                 } else {
                   if ($(this).hasClass('text-box-more-icon')) {
                     $('#text-box-more-page').show()
@@ -576,6 +638,8 @@ $('nav div').click(function () {
   $(`#${page_id}-page`).show()
   if (page_id == 'home') {
     getContent(STAR, CODE, 'all')
+  } else if (page_id == 'wallet') {
+    $('#all_log').click()
   } else if (page_id == 'profile') {
     $('#profile-page .tab #my-posts').click()
   }
@@ -584,6 +648,7 @@ $('nav div').click(function () {
 
 
 //MAIN
+
 const loadingShow = () => {
   $('#loading').css('display', 'flex')
 }
@@ -601,6 +666,12 @@ const addData = (data) => {
     success: function(r) {
       if (r == 'OK') {
         top_alert('Successful', '#265828')
+        PEN -= 1
+        $('.pen').text(PEN)
+        upboxHide()
+        $('#create-post-text').val('')
+        $('.create-post-text-check small').text(0)
+        unablePost()
       } else {
         top_alert('Something wrong', '#265828')
       }
@@ -660,9 +731,9 @@ const bonusAPI = (bonus_type) => {
       type: 'POST',
       data: data,
       success: function (r) {
-        alert(r)
         if (r == 'OK') {
           bonusBoxHide()
+          buyStarANDsellStar(CODE, 'ten_member_invited_log', 0)
         }
       }
   })
@@ -788,39 +859,38 @@ const ablePost = () => {
   })
 }
 
-const createPost = (profile, name, text, user_code, box_id) => {
-  if (text.length > 280 || text == '') {
-    unablePost()
-    if (text == '') {
-      $('.create-post-text-check small').text(0)
+const createPost = (profile, name, text, user_code, box_id, PEN) => {
+  if (PEN > 0) {
+    if (text.length > 280 || text == '') {
+      unablePost()
+      if (text == '') {
+        $('.create-post-text-check small').text(0)
+      } else {
+        $('.create-post-text-check small').text(text.length)
+      }
     } else {
-      $('.create-post-text-check small').text(text.length)
+      if ($('#create-post-btn').hasClass('edit-post-btn')) {
+        let data = {
+          'type': 'edit_post',
+          'box_id': action_id,
+          'content': text
+        }
+        addData(data)
+      } else {
+        time = new Date().getTime()
+        let data = {
+          'type': 'create_post',
+          'profile': profile,
+          'name': name,
+          'code': user_code,
+          'time': time,
+          'content': text
+        }
+        addData(data)
+      }
     }
   } else {
-    if ($('#create-post-btn').hasClass('edit-post-btn')) {
-      let data = {
-        'type': 'edit_post',
-        'box_id': action_id,
-        'content': text
-      }
-      addData(data)
-    } else {
-      time = new Date().getTime()
-      let data = {
-        'type': 'create_post',
-        'profile': profile,
-        'name': name,
-        'code': user_code,
-        'time': time,
-        'content': text
-      }
-      addData(data)
-    }
-    $('#create-post-text').val('')
-    $('.create-post-text-check small').text(0)
-    unablePost()
-    upboxHide()
-    top_alert('Successful', '#265828')
+    top_alert('Not enough pen', '#bb2124')
   }
 }
 
@@ -848,19 +918,22 @@ const deletePost = () => {
   addData(data)
 }
 
-const reportPost = (CODE) => {
-  let text = $('#report-content').val()
-  if (text.length >= 8 && text.length <= 280) {
-    let data = {
-      'type': 'report_post',
-      'box_id': action_id,
-      'user_code': CODE,
-      'content': text
+const reportPost = (CODE, PEN) => {
+  if (PEN > 0) {
+    let text = $('#report-content').val()
+    if (text.length >= 8 && text.length <= 280) {
+      let data = {
+        'type': 'report_post',
+        'box_id': action_id,
+        'user_code': CODE,
+        'content': text
+      }
+      addData(data)
+    } else {
+      top_alert('There is a minimum of 8 and a maximum of 280', '#bb2124')
     }
-    addData(data)
-    upboxHide()
   } else {
-    top_alert('There is a minimum of 8 and a maximum of 280', '#bb2124')
+    top_alert('Not enough pen', '#bb2124')
   }
 }
 
@@ -945,7 +1018,7 @@ const updatePlan = (status, user_code, end_date, SPONSOR) => {
       data: data,
       success: function (r) {
         if (r == 'OK') {
-          top_alert('Update successful', '#265828')
+          buyStarANDsellStar(SPONSOR, 'one_member_invited_log', 0)
           setTimeout(function() {
             location.reload()
           }, 2000);
@@ -1031,6 +1104,88 @@ $('#update-plan-btn').click(function () {
 
 
 //WALLET
+const getWalletLogData = (user_code, log_type)  => {
+  let all_log_count = 0;
+  let recharge_log_count = 0;
+  let withdrawal_log_count = 0;
+  let buy_pen_log_count = 0;
+  let buy_star_log_count = 0;
+  let sell_star_log_count = 0;
+  let one_member_invited_log_count = 0;
+  let ten_member_invited_log_count = 0;
+  $('.log-box-container').html('')
+  $.ajax({
+      url: '../server/wallet_log.php',
+      type: 'GET',
+      data: 'user_code=' + user_code + '&log_type=' + log_type,
+      success: function (r) {
+        let log = JSON.parse(r)
+        if (log.length > 0) {
+          for (let i = 0; i < log.length; i ++) {
+            if (log[i].log_title == 'recharge_log') {
+              recharge_log_count += 1
+            } else if (log[i].log_title == 'withdrawal_log') {
+              withdrawal_log_count += 1
+            } else if (log[i].log_title == 'buy_pen_log') {
+              buy_pen_log_count += 1
+            } else if (log[i].log_title == 'buy_star_log') {
+              buy_star_log_count += 1
+            } else if (log[i].log_title == 'sell_star_log') {
+              sell_star_log_count += 1
+            } else if (log[i].log_title == 'one_member_invited_log') {
+              one_member_invited_log_count += 1
+            } else {
+              ten_member_invited_log_count += 1
+            }
+            let time = timeCalculator(log[i].log_time)
+            $('.log-box-container')[0].innerHTML += `
+                                                      <div class="log-box eb">
+                                                        <div>
+                                                          <h4>${log[i].log_title.replaceAll('_', ' ').toUpperCase().replace('MEMBER', "AUTHOR")}</h4>
+                                                          <i>${time}</i>
+                                                        </div>
+                                                        <div>
+                                                          <small>Amount</small>
+                                                          <b>${log[i].amount + MMK}</b>
+                                                        </div>
+                                                        <div>
+                                                          <small>Fee</small>
+                                                          <b>${log[i].fee + MMK}</b>
+                                                        </div>
+                                                        <div>
+                                                          <small>Star</small>
+                                                          <b>${log[i].star}</b>
+                                                        </div>
+                                                        <div>
+                                                          <small>Date</small>
+                                                          <b>${log[i].log_day} ${log[i].log_month} ${log[i].log_year}</b>
+                                                        </div>
+                                                        <div>
+                                                          <small>Transaction ID</small>
+                                                          <b>${log[i].transaction_ID}</b>
+                                                        </div>
+                                                      </div>
+                                                      `
+          }
+          if (log_type == 'all_log') {
+            all_log_count = log.length
+            $('#all_log small').text(all_log_count)
+            $('#recharge_log small').text(buy_pen_log_count)
+            $('#withdrawal_log small').text(buy_pen_log_count)
+            $('#buy_pen_log small').text(buy_pen_log_count)
+            $('#buy_star_log small').text(buy_star_log_count)
+            $('#sell_star_log small').text(sell_star_log_count)
+            $('#one_member_invited_log small').text(one_member_invited_log_count)
+            $('#ten_member_invited_log small').text(ten_member_invited_log_count)
+          }
+        } else {
+          $('.log-box-container')[0].innerHTML = empty_box
+        }
+        loadingHide()
+      }
+  })
+}
+
 $('#wallet-page').scroll(function() {
   let wallet_page_tab_top = $('#wallet-page .tab').offset().top
   if (wallet_page_tab_top > 57) {
@@ -1353,6 +1508,31 @@ const length_check = () => {
   }
 }
 
+const moneyRequest = () => {
+  let DATE = new Date()
+  let this_year = DATE.getFullYear()
+  let this_month = textMonth(DATE.getMonth())
+  let today = DATE.getDate()
+  let time = DATE.getTime()
+  const form = document.getElementById('money-edit-form')
+  const data = new FormData(form)
+  $.ajax({
+    url: '../server/money_requests.php',
+    type: 'POST',
+    data: data,
+    contentType: false,
+    processData: false,
+    success: function (r) {
+      if (r == 'OK') {
+        top_alert('Will reply within 24 hours', '#265828')
+        upboxHide()
+      } else if (r == 'NO') {
+        top_alert('Not enough balance', '#bb2124')
+      }
+    }
+  })
+}
+
 const deposit = () => {
   let t_no = ''
   let slip = ''
@@ -1370,8 +1550,7 @@ const deposit = () => {
             amount = $('#amount').val()
             if ($('#address').val().length == 11) {
               address = $('#address').val()
-              console.log(account + t_no + slip.name + amount + address)
-              upboxHide()
+              moneyRequest()
             } else {
               top_alert('Invalid Address', '#bb2124')
             }
@@ -1392,21 +1571,67 @@ const deposit = () => {
   }
 }
 
-const buyStarANDsellStar = () => {
-  price = $('.buy-star-box .price').text()
-  if ($('#star-amount').val() > 0) {
-    star_amount = $('#star-amount').val() * 1
-    console.log(price + ' ' + star_amount)
-    upboxHide()
+const withdrawal = () => {
+  let amount = ''
+  let address = ''
+  if ($('#amount').val() > 0 && $('#amount').val() <= parseInt(BALANCE, 10)) {
+    amount = $('#amount').val()
+    if ($('#address').val().length == 11) {
+      address = $('#address').val()
+      moneyRequest()
+    } else {
+      top_alert('Invalid Address', '#bb2124')
+    }
   } else {
-  top_alert('Invalid star Amount', '#bb2124')
+    top_alert('Invalid Amount', '#bb2124')
   }
+}
+
+const buyStarANDsellStar = (CODE, log_type, pen_amount) => {
+  if (log_type == 'buy_star_log' || log_type == 'sell_star_log') {
+    price = $('.buy-star-box .price').text()
+    star_amount = $('#star-amount').val() * 1
+  }
+  if (log_type == 'one_member_invited_log' || log_type == 'ten_member_invited_log') {
+    price = 0
+    star_amount = 0
+  }
+  let DATE = new Date()
+  let this_year = DATE.getFullYear()
+  let this_month = textMonth(DATE.getMonth())
+  let today = DATE.getDate()
+  let time = DATE.getTime()
+  let data = {
+    user_code: CODE,
+    log_type: log_type,
+    amount: price,
+    star: star_amount,
+    pen: pen_amount,
+    fee: (star_amount * 500) * 0.25,
+    day: today,
+    month: this_month,
+    year: this_year,
+    time: time
+  }
+  $.ajax({
+    url: '../server/add_wallet_log.php',
+    type: 'POST',
+    data: data,
+    success: function (r) {
+      if (r == 'OK') {
+        upboxHide()
+        top_alert('Successful', '#265828')
+      } else {
+        top_alert(r, '#bb2124')
+      }
+    }
+  })
 }
 
 const buyStar = () => {
   let price = 0
   if ($('.buy-star-box .price').text() <= BALANCE) {
-    buyStarANDsellStar()
+    buyStarANDsellStar(CODE, 'buy_star_log', 0)
   } else {
     top_alert('Not Enough Balance.', '#bb2124')
   }
@@ -1417,7 +1642,7 @@ const sellStar = () => {
   if ($('.buy-star-box #star-amount').val() <= STAR) {
     if ($('.buy-star-box #star-amount').val() >= 100 && $('.buy-star-box #star-amount').val() <= 100000) {
       star = $('.buy-star-box #star-amount').text()
-      buyStarANDsellStar()
+      buyStarANDsellStar(CODE, 'sell_star_log', 0)
     } else {
     top_alert('100 to 100000', '#bb2124')
     }
@@ -1472,23 +1697,6 @@ const starCalculatePrice = (fn) => {
   }
 }
 
-const withdrawal = () => {
-  let amount = ''
-  let address = ''
-  if ($('#amount').val() > 0 && $('#amount').val() <= parseInt(BALANCE, 10)) {
-    amount = $('#amount').val()
-    if ($('#address').val().length == 11) {
-      address = $('#address').val()
-      console.log(account + amount + address)
-      upboxHide()
-    } else {
-      top_alert('Invalid Address', '#bb2124')
-    }
-  } else {
-    top_alert('Invalid Amount', '#bb2124')
-  }
-}
-
 $('.invite-link-copy').click(function () {
   navigator.clipboard.writeText($('#invite-url').text())
 })
@@ -1497,7 +1705,7 @@ $('.deposit').click(function () {
   fn = 'Deposit'
   $('.title').text(fn)
   $('.accounts').show()
-  $('#money-edit-page > .input').show()
+  $('#money-edit-page form > .input').show()
   $('.buy-star-box').hide()
   $('.t-no').click()
   $('#true').click()
@@ -1507,7 +1715,7 @@ $('.withdrawal').click(function () {
   fn = 'Withdrawal'
   $('.title').text(fn)
   $('.accounts').show()
-  $('#money-edit-page > .input').hide()
+  $('#money-edit-page form > .input').hide()
   $('.buy-star-box').hide()
   $('.amount').show()
   $('.address').show()
@@ -1517,7 +1725,7 @@ $('.withdrawal').click(function () {
 
 $('.buy-star, .sell-star').click(function () {
   $('.accounts').hide()
-  $('#money-edit-page > .input').hide()
+  $('#money-edit-page form > .input').hide()
   $('.buy-star-box').show()
   $('#star-amount').click()
   $('.buy-star-box .price').text(0)
@@ -1555,6 +1763,7 @@ $('.check').click(function () {
   $(this).addClass('checked')
   length_check()
   curser()
+  $('#account').val(account)
 })
 
 $('.copy-address').click(function () {
